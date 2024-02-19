@@ -29,14 +29,18 @@ namespace BookAPI.Controllers
         }
 
         [HttpPut("{id}")] 
-        public JsonResult EditBook(BookDto book)
+        public JsonResult EditBook(int id, BookDto book)
         {
-            //
+            var index = BooksData.current.Books.FindIndex(b=> b.Id == id);
+            BooksData.current.Books[index] = book;
+            return new JsonResult(book);
         }
 
         [HttpDelete("{id}")]
         public string DeleteBook(int id) {
-            //
+            var index = BooksData.current.Books.FindIndex(b => b.Id == id);
+            BooksData.current.Books.RemoveAt(index);
+            return "Livre supprimé";
         }
 
     }
