@@ -5,42 +5,85 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Authors/{authorId}/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
     {
         [HttpGet]
-        public JsonResult GetBooks()
+        public ActionResult<IEnumerable<BookDto>> GetBooksByAuthor(int authorId)
         {
-            return new JsonResult(BooksData.current.Books);
+            var author = BooksData.current.Authors.FirstOrDefault(a=>a.Id==authorId);
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(author.Books);
         }
 
         [HttpGet("{id}")]
-        public JsonResult GetBook(int id) {
-            var book = BooksData.current.Books.FirstOrDefault(b => b.Id == id);
-            return new JsonResult(book);
+        public ActionResult<BookDto> GetBookById(int authorId, int id) {
+            var author = BooksData.current.Authors.FirstOrDefault(a => a.Id == authorId);
+            if(author == null)
+            {
+                return NotFound();
+            }
+
+            var book = author.Books.FirstOrDefault(b => b.Id == id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return Ok(book);
         }
 
         [HttpPost]
-        public JsonResult AddBook(BookDto book)
+        public ActionResult<BookDto> AddBook(int authorId, BookDto book)
         {
-            BooksData.current.Books.Add(book);
-            return new JsonResult(book);
+            var author = BooksData.current.Authors.FirstOrDefault(a => a.Id == authorId);
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            author.Books.Add(book);
+            return Ok(book);
         }
 
         [HttpPut("{id}")] 
-        public JsonResult EditBook(int id, BookDto book)
+        public ActionResult<BookDto> EditBook(int authorId, int id, BookDto book)
         {
-            var index = BooksData.current.Books.FindIndex(b=> b.Id == id);
-            BooksData.current.Books[index] = book;
-            return new JsonResult(book);
+
+            var author = BooksData.current.Authors.FirstOrDefault(a => a.Id == authorId);
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            var index = author.Books.FindIndex(b=> b.Id == id);
+            if(index == -1)
+            {
+                return NotFound();
+            }
+            author.Books[index] = book;
+            return Ok(book);
         }
 
         [HttpDelete("{id}")]
-        public string DeleteBook(int id) {
-            var index = BooksData.current.Books.FindIndex(b => b.Id == id);
-            BooksData.current.Books.RemoveAt(index);
-            return "Livre supprimé";
+        public ActionResult<string> DeleteBook(int authorId, int id) {
+            var author = BooksData.current.Authors.FirstOrDefault(a => a.Id == authorId);
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            var index = author.Books.FindIndex(b => b.Id == id);
+            if (index == -1)
+            {
+                return NotFound();
+            }
+            author.Books.RemoveAt(index);
+            return Ok("Livre supprimé");
         }
 
     }
