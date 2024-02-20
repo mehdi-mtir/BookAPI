@@ -1,6 +1,7 @@
 ﻿using BookAPI.data;
 using BookAPI.Entities;
 using BookAPI.Model;
+using BookAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,13 +13,16 @@ namespace BookAPI.Controllers
     public class AuthorsController : ControllerBase
     {
         private BookShopContext _context;
-        public AuthorsController(BookShopContext context) {
+        private readonly MyService _myService;
+        public AuthorsController(BookShopContext context, MyService myService) {
             _context = context;
+            _myService = myService;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
         {
+            _myService.showRequestDetails("GET", DateTime.Now);
             var authors = _context.Authors.Include(a=>a.Books);
             var authorsToReturn = new List<AuthorDto>();
             foreach (var author in authors)
@@ -36,6 +40,7 @@ namespace BookAPI.Controllers
         [HttpGet("{id}")]
         public ActionResult<AuthorDto> GetAuthorsById(int id)
         {
+            _myService.showRequestDetails("GET", DateTime.Now);
             var author = _context.Authors.Include(a => a.Books).FirstOrDefault(a => a.Id == id);
             //var author = _context.Authors.Find(id);
             if (author == null)
@@ -53,6 +58,7 @@ namespace BookAPI.Controllers
         [HttpPost]
         public ActionResult<AuthorDto> AddAuthor(AuthorDto author)
         {
+            _myService.showRequestDetails("POST", DateTime.Now);
             var authorToAdd = new Author() { FirstName = author.FirstName, LastName = author.LastName };
             foreach (var book in author.Books)
             {
@@ -67,6 +73,7 @@ namespace BookAPI.Controllers
         [HttpPut("{id}")]
         public ActionResult<AuthorDto> EditAuthor(int id, AuthorDto author)
         {
+            _myService.showRequestDetails("PUT", DateTime.Now);
             var authorToEdit = _context.Authors.Find(id);
             //var authorToEdit = _context.Authors.Include(a => a.Books).FirstOrDefault(a => a.Id == id);
 
@@ -89,6 +96,7 @@ namespace BookAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult<string> DeleteAuthor(int id)
         {
+            _myService.showRequestDetails("DELETE", DateTime.Now);
             var authorToDelete = _context.Authors.Find(id);
             if (authorToDelete == null)
             {
