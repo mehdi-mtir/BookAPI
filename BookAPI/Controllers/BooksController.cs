@@ -38,7 +38,7 @@ namespace BookAPI.Controllers
 
         [HttpGet("{id}")]
         public ActionResult<BookDto> GetBookById(int authorId, int id) {
-            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
+            var author = _context.Authors.Include(a=>a.Books).FirstOrDefault(a => a.Id == authorId);
             if(author == null)
             {
                 return NotFound();
@@ -72,7 +72,7 @@ namespace BookAPI.Controllers
         public ActionResult<BookDto> EditBook(int authorId, int id, BookDto book)
         {
 
-            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
+            var author = _context.Authors.Include(a=>a.Books).FirstOrDefault(a => a.Id == authorId);
             if (author == null)
             {
                 return NotFound();
@@ -90,7 +90,7 @@ namespace BookAPI.Controllers
 
         [HttpDelete("{id}")]
         public ActionResult<string> DeleteBook(int authorId, int id) {
-            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
+            var author = _context.Authors.Include(a => a.Books).FirstOrDefault(a => a.Id == authorId);
             if (author == null)
             {
                 return NotFound();

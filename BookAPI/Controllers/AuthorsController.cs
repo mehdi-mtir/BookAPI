@@ -68,6 +68,7 @@ namespace BookAPI.Controllers
         public ActionResult<AuthorDto> EditAuthor(int id, AuthorDto author)
         {
             var authorToEdit = _context.Authors.Find(id);
+            //var authorToEdit = _context.Authors.Include(a => a.Books).FirstOrDefault(a => a.Id == id);
 
             if (authorToEdit == null)
             {
@@ -75,11 +76,12 @@ namespace BookAPI.Controllers
             }
             authorToEdit.FirstName = author.FirstName;
             authorToEdit.LastName = author.LastName;
+            /*
             authorToEdit.Books = new List<Book>();
             foreach (var book in author.Books)
             {
                 authorToEdit.Books.Add(new Book() { Title = book.Title, Price = book.Price, PublishDate = book.PublishDate });
-            }
+            }*/
             _context.SaveChanges();
             return Ok(author);
         }
