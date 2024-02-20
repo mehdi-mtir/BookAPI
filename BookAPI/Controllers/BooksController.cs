@@ -72,7 +72,7 @@ namespace BookAPI.Controllers
         public ActionResult<BookDto> EditBook(int authorId, int id, BookDto book)
         {
 
-            var author = BooksData.current.Authors.FirstOrDefault(a => a.Id == authorId);
+            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
             if (author == null)
             {
                 return NotFound();
@@ -83,13 +83,14 @@ namespace BookAPI.Controllers
             {
                 return NotFound();
             }
-            author.Books[index] = book;
+            author.Books[index] = new Book() { Title = book.Title, Price = book.Price, PublishDate = book.PublishDate };
+            _context.SaveChanges();
             return Ok(book);
         }
 
         [HttpDelete("{id}")]
         public ActionResult<string> DeleteBook(int authorId, int id) {
-            var author = BooksData.current.Authors.FirstOrDefault(a => a.Id == authorId);
+            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
             if (author == null)
             {
                 return NotFound();
@@ -101,6 +102,7 @@ namespace BookAPI.Controllers
                 return NotFound();
             }
             author.Books.RemoveAt(index);
+            _context.SaveChanges();
             return Ok("Livre supprimé");
         }
 
