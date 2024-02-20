@@ -9,10 +9,15 @@ namespace BookAPI.Controllers
     [ApiController]
     public class AuthorsController : ControllerBase
     {
+        private BookShopContext _context;
+        public AuthorsController(BookShopContext context) {
+            _context = context;
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
         {
-            return Ok(BooksData.current.Authors);
+            return Ok(_context.Authors);
         }
 
         [HttpGet("{id}")]
