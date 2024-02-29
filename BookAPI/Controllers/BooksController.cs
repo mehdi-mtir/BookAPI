@@ -1,118 +1,60 @@
 ﻿using BookAPI.data;
 using BookAPI.Entities;
 using BookAPI.Model;
-using BookAPI.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BookAPI.Controllers
 {
-    [Route("api/Authors/{authorId}/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
     {
+
         private BookShopContext _context;
-        private readonly MyService _myService;
 
-        public BooksController(BookShopContext context, MyService myService) {
-            _context = context;
-            _myService = myService;
-        }
-
-        [HttpGet]
-        public ActionResult<IEnumerable<BookDto>> GetBooksByAuthor(int authorId)
+        public BooksController(BookShopContext context)
         {
-            _myService.showRequestDetails("GET", DateTime.Now);
-            var author = _context.Authors.Include(a=>a.Books).FirstOrDefault(a=>a.Id==authorId);
-            if (author == null)
-            {
-                return NotFound();
-            }
-            
-            var books = new List<BookDto>();
-            foreach (var b in author.Books)
-            {
-                var book = new BookDto() { Id = b.Id, Title = b.Title, Price = b.Price, PublishDate = b.PublishDate };
-                books.Add(book);
-            }
-
+            _context = context;
+        }
+        // GET: api/<BooksController>
+        [HttpGet]
+        public ActionResult<IEnumerable<BookDto>> GetBooks()
+        {
+            var books = _context.Books;
             return Ok(books);
         }
 
+        // GET api/<BooksController>/5
         [HttpGet("{id}")]
-        public ActionResult<BookDto> GetBookById(int authorId, int id) {
-            _myService.showRequestDetails("GET", DateTime.Now);
-            var author = _context.Authors.Include(a=>a.Books).FirstOrDefault(a => a.Id == authorId);
-            if(author == null)
-            {
-                return NotFound();
-            }
-
-            var book = author.Books.FirstOrDefault(b => b.Id == id);
-
-            if (book == null)
-            {
-                return NotFound();
-            }
-            return Ok(new BookDto { Id = book.Id, Title = book.Title, Price = book.Price, PublishDate = book.PublishDate});
+        public ActionResult<BookDto> GetBookById(int id)
+        {
+            var book = _context.Books.Find(id);
+            return Ok(book);
         }
 
+        // POST api/<BooksController>
         [HttpPost]
         public ActionResult<BookDto> AddBook(int authorId, BookDto book)
         {
-            _myService.showRequestDetails("POST", DateTime.Now); 
-            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
-            if (author == null)
-            {
-                return NotFound();
-            }
-
-            var newBook = new Book() { Title = book.Title, Price = book.Price, PublishDate= book.PublishDate, AuthorId = authorId };
-            author.Books.Add(newBook);
+            var newBook = new Book() { Title = book.Title, Price = book.Price, PublishDate = book.PublishDate, AuthorId = authorId };
+            _context.Books.Add(newBook);
             _context.SaveChanges();
             return Ok(book);
         }
 
-        [HttpPut("{id}")] 
-        public ActionResult<BookDto> EditBook(int authorId, int id, BookDto book)
+        // PUT api/<BooksController>/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] string value)
         {
-
-            _myService.showRequestDetails("PUT", DateTime.Now); 
-            var author = _context.Authors.Include(a=>a.Books).FirstOrDefault(a => a.Id == authorId);
-            if (author == null)
-            {
-                return NotFound();
-            }
-
-            var index = author.Books.FindIndex(b=> b.Id == id);
-            if(index == -1)
-            {
-                return NotFound();
-            }
-            author.Books[index] = new Book() { Title = book.Title, Price = book.Price, PublishDate = book.PublishDate };
-            _context.SaveChanges();
-            return Ok(book);
         }
 
+        // DELETE api/<BooksController>/5
         [HttpDelete("{id}")]
-        public ActionResult<string> DeleteBook(int authorId, int id) {
-            _myService.showRequestDetails("DELETE", DateTime.Now); 
-            var author = _context.Authors.Include(a => a.Books).FirstOrDefault(a => a.Id == authorId);
-            if (author == null)
-            {
-                return NotFound();
-            }
-
-            var index = author.Books.FindIndex(b => b.Id == id);
-            if (index == -1)
-            {
-                return NotFound();
-            }
-            author.Books.RemoveAt(index);
-            _context.SaveChanges();
-            return Ok("Livre supprimé");
+        public void Delete(int id)
+        {
         }
-
     }
 }
