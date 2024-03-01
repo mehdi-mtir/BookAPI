@@ -37,9 +37,9 @@ namespace BookAPI.Controllers
 
         // POST api/<BooksController>
         [HttpPost]
-        public ActionResult<BookDto> AddBook(int authorId, BookDto book)
+        public ActionResult<BookDto> AddBook(BookDto book)
         {
-            var newBook = new Book() { Title = book.Title, Price = book.Price, PublishDate = book.PublishDate, AuthorId = authorId };
+            var newBook = new Book() { Title = book.Title, Price = book.Price, PublishDate = book.PublishDate, AuthorId = book.AuthorId };
             _context.Books.Add(newBook);
             _context.SaveChanges();
             return Ok(book);
@@ -47,14 +47,19 @@ namespace BookAPI.Controllers
 
         // PUT api/<BooksController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ActionResult<BookDto> EditBook(int id, BookDto book)
         {
+            _context.Books.Update(new Book() { Id = id, Title = book.Title, Price = book.Price, PublishDate = book.PublishDate, AuthorId = book.AuthorId });
+            _context.SaveChanges();
+            return Ok(book);
         }
 
         // DELETE api/<BooksController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            _context.Books.Remove(_context.Books.Find(id));
+            _context.SaveChanges();
         }
     }
 }

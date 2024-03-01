@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookAPI.Controllers
 {
-    [Route("api/Authors/{authorId}/[controller]")]
+    [Route("api/Authors/{authorId}/Books")]
     [ApiController]
     public class BooksByAuthorController : ControllerBase
     {

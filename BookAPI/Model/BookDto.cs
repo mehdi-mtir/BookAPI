@@ -7,5 +7,7 @@
         //public string Author { get; set; }
         public DateOnly PublishDate { get; set; }
         public Decimal Price { get; set; }
+
+       public int AuthorId { get; set; }
     }
 }
