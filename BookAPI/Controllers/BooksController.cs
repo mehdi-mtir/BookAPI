@@ -1,6 +1,7 @@
 ﻿using BookAPI.data;
 using BookAPI.Entities;
 using BookAPI.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class BooksController : ControllerBase
     {
